@@ -1,35 +1,26 @@
+#include <vector>
+
 #include <iostream>
 #include <cstring>
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+#include "rasterizer.h"
+
 
 int main()
 {
-    std::cout << "fffrenderer" << std::endl;
-
-    int w = 100, h = 100, n = 3;
-    unsigned long nbytes = w*h*n;
-    unsigned char* data;
-
-    data = new unsigned char[nbytes];
-    std::memset(data, 0, nbytes);
-
-    int rw = 20, rh = 20;
-    unsigned char red[3] = {255, 0, 0};
-    for (int i = 0; i < rw; i++)
-    {
-        for (int j = 0; j < rh; j++)
-        {
-            std::memcpy(data+(i+j*w)*n, red, n);
-        }
-    }
-
-    if (stbi_write_bmp("build/output.bmp", w, h, n, data) )
-    {
-        std::cout << "build/output.bmp success" << std::endl;
-    }
+	fff::Rasterizer r(100, 100, 4);
+	//r.DrawLine_V1(fff::IntPoint(20, 60), fff::IntPoint(80, 40), fff::Color::Blue);
+	//r.DrawLine_V2(fff::IntPoint(20, 60), fff::IntPoint(80, 40), fff::Color::Blue);
+	//r.DrawLine_V2(fff::IntPoint(80, 40), fff::IntPoint(20, 60), fff::Color::Red);
+	//r.DrawLine_V2(fff::IntPoint(20, 40), fff::IntPoint(40, 80), fff::Color::Red);
+	//r.DrawLine_V3(fff::IntPoint(20, 60), fff::IntPoint(80, 40), fff::Color::Blue);
+	//r.DrawLine_V3(fff::IntPoint(80, 40), fff::IntPoint(20, 60), fff::Color::Red);
+	//r.DrawLine_V3(fff::IntPoint(20, 40), fff::IntPoint(40, 80), fff::Color::Red);
+	r.DrawLine_V4(fff::IntPoint(20, 60), fff::IntPoint(80, 40), fff::Color::Blue);
+	r.DrawLine_V4(fff::IntPoint(80, 40), fff::IntPoint(20, 60), fff::Color::Red);
+	r.DrawLine_V4(fff::IntPoint(20, 40), fff::IntPoint(40, 80), fff::Color::Red);
+    r.Serialize("C:\\Users\\travm\\Repos\\travmygit\\fffrenderer\\output\\output1.png");
 
     return 0;
 }

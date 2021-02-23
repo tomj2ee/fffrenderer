@@ -4,7 +4,9 @@ project(fffrenderer VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-add_executable(fffrenderer main.cpp)
+file(GLOB SOURCES *.h *.cpp)
+
+add_executable(${PROJECT_NAME} ${SOURCES})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
