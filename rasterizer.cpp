@@ -205,7 +205,7 @@ void fff::Rasterizer::DrawLine_V5(const fff::IntPoint& Start, const fff::IntPoin
 			derror += dx;
 			if (derror >= dy)
 			{
-				y += (y2 > y1) ? 1 : -1;
+				x += (x2 > x1) ? 1 : -1;
 				derror -= dy;
 			}
 		}
