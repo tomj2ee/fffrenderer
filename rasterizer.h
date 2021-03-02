@@ -90,11 +90,7 @@ public:
     void SetPixel(int X, int Y, const fff::Color& Color);
     void SetPixel(const fff::IntPoint& Point, const fff::Color& Color);
 
-	void DrawLine_V1(const fff::IntPoint& Start, const fff::IntPoint& End, const fff::Color& Color);
-	void DrawLine_V2(const fff::IntPoint& Start, const fff::IntPoint& End, const fff::Color& Color);
-	void DrawLine_V3(const fff::IntPoint& Start, const fff::IntPoint& End, const fff::Color& Color);
-	void DrawLine_V4(const fff::IntPoint& Start, const fff::IntPoint& End, const fff::Color& Color);
-	void DrawLine_V5(const fff::IntPoint& Start, const fff::IntPoint& End, const fff::Color& Color);
+	void DrawLine(const fff::IntPoint& Start, const fff::IntPoint& End, const fff::Color& Color);
 
     int GetWidth() const;
     int GetHeight() const;
