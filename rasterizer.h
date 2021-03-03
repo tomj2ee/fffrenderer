@@ -1,91 +1,16 @@
 #pragma once
 
 #include <vector>
-#include "stb_image.h"
-#include "stb_image_write.h"
+#include "maths.h"
+#include "graphics.h"
+
 
 namespace fff {
-
-struct Color
-{
-    union
-    {
-        struct
-        {
-            unsigned char R, G, B, A;
-        };
-        unsigned char Raw[4];
-        unsigned int Value;
-    };
-
-    /** Number of components */
-    int N;
-
-    Color() : Value(0), N(1)
-    {}
-
-    Color(unsigned char _R, unsigned char _G, unsigned char _B, unsigned char _A) : R(_R), G(_G), B(_B), A(_A), N(4)
-    {}
-
-    Color(int _Value, int _N) : Value(_Value), N(_N)
-    {}
-
-    Color(const unsigned char* _Raw, int _N) : Value(0), N(_N)
-    {
-        for (int i = 0; i < _N; ++i)
-        {
-            Raw[i] = _Raw[i];
-        }
-    }
-
-    Color(const Color& Others) : Value(Others.Value), N(Others.N)
-    {}
-
-    Color& operator = (const Color& Others)
-    {
-        if (this != &Others)
-        {
-            Value = Others.Value;
-            N = Others.N;
-        }
-        return *this;
-    }
-
-    static Color White;
-    static Color Black;
-    static Color Red;
-    static Color Green;
-    static Color Blue;
-};
-
-struct IntPoint
-{
-    int X, Y;
-
-    IntPoint() : X(0), Y(0)
-    {}
-
-    IntPoint(int _X, int _Y) : X(_X), Y(_Y)
-    {}
-
-    IntPoint(const IntPoint& Others) : X(Others.X), Y(Others.Y)
-    {}
-
-    IntPoint& operator = (const IntPoint& Others)
-    {
-        if (this != &Others)
-        {
-            X = Others.X;
-            Y = Others.Y;
-        }
-        return *this;
-    }
-};
 
 class Rasterizer
 {
 public:
-	Rasterizer(int _Width, int _Height, int _Components = 3);
+	Rasterizer(int _Width, int _Height);
 
     void SetPixel(int X, int Y, const fff::Color& Color);
     void SetPixel(const fff::IntPoint& Point, const fff::Color& Color);
@@ -94,9 +19,8 @@ public:
 
     int GetWidth() const;
     int GetHeight() const;
-    int GetComponents() const;
 
-	bool Serialize(char const* Filename) const;
+	bool Serialize(const char* Filename, const int Components = 4, const fff::ImageType Type = fff::ImageType::PNG) const;
 
 private:
     int GetIndex_Unsafe(int X, int Y) const;
@@ -106,8 +30,6 @@ private:
     int Width;
     /** Height of frame buffer */
     int Height;
-    /** Number of components of color */
-    int Components;
     /** Frame buffer */
     std::vector<fff::Color> FrameBuffer;
 };

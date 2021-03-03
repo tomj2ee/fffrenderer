@@ -1,15 +1,13 @@
 #include "rasterizer.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
-fff::Color fff::Color::White = fff::Color(255, 255, 255, 255);
-fff::Color fff::Color::Black = fff::Color(0, 0, 0, 255);
-fff::Color fff::Color::Red = fff::Color(255, 0, 0, 255);
-fff::Color fff::Color::Green = fff::Color(0, 255, 0, 255);
-fff::Color fff::Color::Blue = fff::Color(0, 0, 255, 255);
 
-fff::Rasterizer::Rasterizer(int _Width, int _Height, int _Components /* = 3 */)
+fff::Rasterizer::Rasterizer(int _Width, int _Height)
     : Width(_Width)
     , Height(_Height)
-    , Components(_Components)
 {
     FrameBuffer.resize(_Width*_Height);
 }
@@ -100,14 +98,17 @@ int fff::Rasterizer::GetHeight() const
     return Height;
 }
 
-int fff::Rasterizer::GetComponents() const
+bool fff::Rasterizer::Serialize(const char* Filename, const int Components /*= 4*/, const fff::ImageType Type /*= fff::ImageType::PNG*/) const
 {
-    return Components;
-}
+	bool bResult = false;
 
-bool fff::Rasterizer::Serialize(char const* Filename) const
-{
+	if (Components < 0 || Components > 4)
+	{
+		return bResult;
+	}
+
 	unsigned char* RawData = new unsigned char[Height*Width*Components];
+
 	std::memset(RawData, 255, Height*Width*Components);
 	for (int i = 0; i < Height; ++i)
 	{
@@ -119,7 +120,16 @@ bool fff::Rasterizer::Serialize(char const* Filename) const
 			}
 		}
 	}
-	bool bResult = stbi_write_png(Filename, Width, Height, Components, RawData, 0);
+
+	switch (Type)
+	{
+	case ImageType::PNG:
+		bResult = stbi_write_png(Filename, Width, Height, Components, RawData, 0);
+		break;
+	default:
+		bResult = false;
+	}
+
 	delete RawData;
 	return bResult;
 }
