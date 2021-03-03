@@ -7,13 +7,11 @@
 本项目全程使用 C++ 编写，使用 CMake 构建。
 
 ### Windows
-推荐的工作环境：编译器 MinGW-GCC ，构建脚本 CMake 。
+推荐的工作环境：编译器 VS2017 ，构建脚本 CMake 。
 
-1. 安装 MinGW
+1. 安装 VS2017
 2. 安装 CMake
-3. 安装 VSCode 的 CMake 插件
-4. VSCode Ctrl+Shift+P 使用 `CMake: Clean Rebuild` 构建
-5. VSCode Ctrl+Shift+P 使用 `CMake: Debug` 调试代码
+3. mkdir build & cd build & cmake .. 生成 .sln 构建与调试代码
 
 ### Linux
 推荐的工作环境：编译器 GCC ，构建脚本 CMake 。
