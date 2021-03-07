@@ -1,4 +1,5 @@
 #include "rasterizer.h"
+#include <algorithm>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -88,6 +89,64 @@ void fff::Rasterizer::DrawLine(const fff::IntPoint& Start, const fff::IntPoint& 
 	}
 }
 
+void fff::Rasterizer::DrawTriangleV1(fff::IntPoint V1, fff::IntPoint V2, fff::IntPoint V3, const fff::Color& Color)
+{
+	if (V1.Y > V2.Y) std::swap(V1, V2);
+	if (V1.Y > V3.Y) std::swap(V1, V3);
+	if (V2.Y > V3.Y) std::swap(V2, V3);
+
+	if (V2.Y == V3.Y)
+	{
+		FillFlatBottomTriangle(V1, V2, V3, Color);
+	}
+	else if (V1.Y == V2.Y)
+	{
+		FillFlatTopTriangle(V1, V2, V3, Color);
+	}
+	else
+	{
+		fff::IntPoint V4((int)(V1.X + ((float)(V2.Y - V1.Y) / (float)(V3.Y - V1.Y)) * (V3.X - V1.X)), V2.Y);
+		FillFlatBottomTriangle(V1, V2, V4, Color);
+		FillFlatTopTriangle(V2, V4, V3, Color);
+	}
+}
+
+void fff::Rasterizer::DrawTriangleV2(fff::IntPoint V1, fff::IntPoint V2, fff::IntPoint V3, const fff::Color& Color)
+{
+	int MinX = V1.X;
+	MinX = std::min(MinX, V2.X);
+	MinX = std::min(MinX, V3.X);
+
+	int MinY = V1.Y;
+	MinY = std::min(MinY, V2.Y);
+	MinY = std::min(MinY, V3.Y);
+
+	int MaxX = V1.X;
+	MaxX = std::max(MaxX, V2.X);
+	MaxX = std::max(MaxX, V3.X);
+
+	int MaxY = V1.Y;
+	MaxY = std::max(MaxY, V2.Y);
+	MaxY = std::max(MaxY, V3.Y);
+
+	fff::IntPoint BoundingBoxMin(MinX, MinY);
+	fff::IntPoint BoundingBoxMax(MaxX, MaxY);
+
+	fff::IntPoint P;
+	for (P.X = BoundingBoxMin.X; P.X <= BoundingBoxMax.X; ++P.X)
+	{
+		for (P.Y = BoundingBoxMin.Y; P.Y <= BoundingBoxMax.Y; ++P.Y)
+		{
+			fff::Vector Coord = fff::Vector::Barycentric(V1, V2, V3, P);
+			if (Coord.X < 0 || Coord.Y < 0 || Coord.Z < 0)
+			{
+				continue;
+			}
+			SetPixel(P.X, P.Y, Color);
+		}
+	}
+}
+
 int fff::Rasterizer::GetWidth() const
 {
     return Width;
@@ -132,6 +191,38 @@ bool fff::Rasterizer::Serialize(const char* Filename, const int Components /*= 4
 
 	delete RawData;
 	return bResult;
+}
+
+void fff::Rasterizer::FillFlatBottomTriangle(const fff::IntPoint& V1, const fff::IntPoint& V2, const fff::IntPoint& V3, const fff::Color& Color)
+{
+	float InvSlope1 = (float)(V2.X - V1.X) / (float)(V2.Y - V1.Y);
+	float InvSlope2 = (float)(V3.X - V1.X) / (float)(V3.Y - V1.Y);
+
+	float CurX1 = (float)V1.X;
+	float CurX2 = (float)V1.X;
+
+	for (int ScanlineY = V1.Y; ScanlineY <= V2.Y; ++ScanlineY)
+	{
+		DrawLine(fff::IntPoint((int)CurX1, ScanlineY), fff::IntPoint((int)CurX2, ScanlineY), Color);
+		CurX1 += InvSlope1;
+		CurX2 += InvSlope2;
+	}
+}
+
+void fff::Rasterizer::FillFlatTopTriangle(const fff::IntPoint& V1, const fff::IntPoint& V2, const fff::IntPoint& V3, const fff::Color& Color)
+{
+	float InvSlope1 = (float)(V3.X - V1.X) / (float)(V3.Y - V1.Y);
+	float InvSlope2 = (float)(V3.X - V2.X) / (float)(V3.Y - V2.Y);
+
+	float CurX1 = (float)V3.X;
+	float CurX2 = (float)V3.X;
+
+	for (int ScanlineY = V3.Y; ScanlineY > V1.Y; --ScanlineY)
+	{
+		DrawLine(fff::IntPoint((int)CurX1, ScanlineY), fff::IntPoint((int)CurX2, ScanlineY), Color);
+		CurX1 -= InvSlope1;
+		CurX2 -= InvSlope2;
+	}
 }
 
 int fff::Rasterizer::GetIndex_Unsafe(int X, int Y) const
