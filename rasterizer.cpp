@@ -56,11 +56,11 @@ void fff::Rasterizer::DrawLine(const fff::IntPoint& Start, const fff::IntPoint& 
 		{
 			SetPixel(x, y, Color);
 
-			derror += dy;
+			derror += 2 * dy;
 			if (derror >= dx)
 			{
 				y += (y2 > y1) ? 1 : -1;
-				derror -= dx;
+				derror -= 2 * dx;
 			}
 		}
 	}
@@ -78,11 +78,11 @@ void fff::Rasterizer::DrawLine(const fff::IntPoint& Start, const fff::IntPoint& 
 		{
 			SetPixel(x, y, Color);
 
-			derror += dx;
+			derror += 2 * dx;
 			if (derror >= dy)
 			{
 				x += (x2 > x1) ? 1 : -1;
-				derror -= dy;
+				derror -= 2 * dy;
 			}
 		}
 	}
