@@ -63,4 +63,9 @@ enum class ImageType : std::uint8_t
 	PNG,
 };
 
+enum class ModelType : std::uint8_t
+{
+	OBJ,
+};
+
 } // namespace fff
