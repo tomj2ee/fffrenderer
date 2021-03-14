@@ -121,35 +121,30 @@ int fff::Rasterizer::GetHeight() const
     return Height;
 }
 
-void fff::Rasterizer::LoadAndDrawModel(const char* Filename, const fff::ModelType Type /*= ModelType::OBJ*/)
+void fff::Rasterizer::LoadAndDrawModel(const char* Filename, const fff::RenderMode Mode /*= RenderMode::FRAME*/, const fff::ModelType Type /*= ModelType::OBJ*/)
 {
 	if (Type == ModelType::OBJ)
 	{
-		std::cout << "Loading OBJ " << Filename << std::endl;
+		tinyobj::ObjReaderConfig ReaderConfig;
+		tinyobj::ObjReader Reader;
 
-		tinyobj::attrib_t attrib;
-		std::vector<tinyobj::shape_t> shapes;
-		std::vector<tinyobj::material_t> materials;
-		std::string warn;
-		std::string err;
-
-		bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, Filename);
-
-		if (!warn.empty())
+		if (!Reader.ParseFromFile(Filename, ReaderConfig))
 		{
-			std::cout << "WARN: " << warn << std::endl;
-		}
-
-		if (!err.empty())
-		{
-			std::cout << "ERR: " << err << std::endl;
-		}
-
-		if (!ret)
-		{
-			std::cout << "Failed to load/parse obj " << Filename << std::endl;
+			if (!Reader.Error().empty())
+			{
+				std::cerr << "TinyObjReader: " << Reader.Error();
+			}
 			return;
 		}
+
+		if (!Reader.Warning().empty())
+		{
+			std::cout << "TinyObjReader: " << Reader.Warning();
+		}
+
+		auto& attrib = Reader.GetAttrib();
+		auto& shapes = Reader.GetShapes();
+		auto& materials = Reader.GetMaterials();
 
 		for (size_t s = 0; s < shapes.size(); s++)
 		{
@@ -157,22 +152,52 @@ void fff::Rasterizer::LoadAndDrawModel(const char* Filename, const fff::ModelTyp
 			for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++)
 			{
 				size_t fv = shapes[s].mesh.num_face_vertices[f];
-				for (size_t v = 0; v < fv - 1; v++)
+				if (Mode == RenderMode::FRAME)
 				{
-					//
-					tinyobj::index_t idx0 = shapes[s].mesh.indices[index_offset + v];
-					tinyobj::real_t vx0 = attrib.vertices[3 * idx0.vertex_index + 0];
-					tinyobj::real_t vy0 = attrib.vertices[3 * idx0.vertex_index + 1];
-					tinyobj::real_t vz0 = attrib.vertices[3 * idx0.vertex_index + 2];
-					//
-					tinyobj::index_t idx1 = shapes[s].mesh.indices[index_offset + v + 1];
-					tinyobj::real_t vx1 = attrib.vertices[3 * idx1.vertex_index + 0];
-					tinyobj::real_t vy1 = attrib.vertices[3 * idx1.vertex_index + 1];
-					tinyobj::real_t vz1 = attrib.vertices[3 * idx1.vertex_index + 2];
-					//
-					fff::IntPoint p0((int)((vx0 + 1.f)*Width / 2), (int)((vy0 + 1.f)*Height / 2));
-					fff::IntPoint p1((int)((vx1 + 1.f)*Width / 2), (int)((vy1 + 1.f)*Height / 2));
-					DrawLine(p0, p1, fff::Color::Blue);
+					for (size_t v = 0; v < fv - 1; v++)
+					{
+						//
+						tinyobj::index_t idx0 = shapes[s].mesh.indices[index_offset + v];
+						tinyobj::real_t vx0 = attrib.vertices[3 * idx0.vertex_index + 0];
+						tinyobj::real_t vy0 = attrib.vertices[3 * idx0.vertex_index + 1];
+						tinyobj::real_t vz0 = attrib.vertices[3 * idx0.vertex_index + 2];
+						//
+						tinyobj::index_t idx1 = shapes[s].mesh.indices[index_offset + v + 1];
+						tinyobj::real_t vx1 = attrib.vertices[3 * idx1.vertex_index + 0];
+						tinyobj::real_t vy1 = attrib.vertices[3 * idx1.vertex_index + 1];
+						tinyobj::real_t vz1 = attrib.vertices[3 * idx1.vertex_index + 2];
+						//
+						fff::IntPoint p0((int)((vx0 + 1.f)*Width / 2), (int)((vy0 + 1.f)*Height / 2));
+						fff::IntPoint p1((int)((vx1 + 1.f)*Width / 2), (int)((vy1 + 1.f)*Height / 2));
+						DrawLine(p0, p1, fff::Color::Blue);
+					}
+				}
+				else if (Mode == RenderMode::FILLED)
+				{
+					{
+						size_t v = 0;
+						//
+						tinyobj::index_t idx0 = shapes[s].mesh.indices[index_offset + v];
+						tinyobj::real_t vx0 = attrib.vertices[3 * idx0.vertex_index + 0];
+						tinyobj::real_t vy0 = attrib.vertices[3 * idx0.vertex_index + 1];
+						tinyobj::real_t vz0 = attrib.vertices[3 * idx0.vertex_index + 2];
+						//
+						tinyobj::index_t idx1 = shapes[s].mesh.indices[index_offset + v + 1];
+						tinyobj::real_t vx1 = attrib.vertices[3 * idx1.vertex_index + 0];
+						tinyobj::real_t vy1 = attrib.vertices[3 * idx1.vertex_index + 1];
+						tinyobj::real_t vz1 = attrib.vertices[3 * idx1.vertex_index + 2];
+						//
+						tinyobj::index_t idx2 = shapes[s].mesh.indices[index_offset + v + 2];
+						tinyobj::real_t vx2 = attrib.vertices[3 * idx2.vertex_index + 0];
+						tinyobj::real_t vy2 = attrib.vertices[3 * idx2.vertex_index + 1];
+						tinyobj::real_t vz2 = attrib.vertices[3 * idx2.vertex_index + 2];
+						//
+						fff::IntPoint p0((int)((vx0 + 1.f)*Width / 2), (int)((vy0 + 1.f)*Height / 2));
+						fff::IntPoint p1((int)((vx1 + 1.f)*Width / 2), (int)((vy1 + 1.f)*Height / 2));
+						fff::IntPoint p2((int)((vx2 + 1.f)*Width / 2), (int)((vy2 + 1.f)*Height / 2));
+						DrawTriangle(p0, p1, p2, fff::Color(rand() % 256, rand() % 256, rand() % 256, 255));
+						//DrawTriangle(p0, p1, p2, fff::Color::Blue);
+					}
 				}
 				index_offset += fv;
 			}

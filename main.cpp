@@ -14,7 +14,8 @@ int main()
 
 	fff::Rasterizer r(width, height);
 
-	r.LoadAndDrawModel(filename);
+	r.LoadAndDrawModel(filename, fff::RenderMode::FRAME);
+	//r.LoadAndDrawModel(filename, fff::RenderMode::FILLED);
 
 	r.Serialize("output.png", true);
 

@@ -21,7 +21,7 @@ public:
     int GetWidth() const;
     int GetHeight() const;
 
-	void LoadAndDrawModel(const char* Filename, const fff::ModelType Type = ModelType::OBJ);
+	void LoadAndDrawModel(const char* Filename, const fff::RenderMode Mode = RenderMode::FRAME, const fff::ModelType Type = ModelType::OBJ);
 
 	bool Serialize(const char* Filename, bool FlipVerticallyOnWrite = false, const int Components = 4, const fff::ImageType Type = fff::ImageType::PNG) const;
 

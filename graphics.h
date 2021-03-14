@@ -68,4 +68,10 @@ enum class ModelType : std::uint8_t
 	OBJ,
 };
 
+enum class RenderMode : std::uint8_t
+{
+	FRAME,
+	FILLED,
+};
+
 } // namespace fff
