@@ -196,7 +196,6 @@ void fff::Rasterizer::LoadAndDrawModel(const char* Filename, const fff::RenderMo
 						fff::IntPoint p1((int)((vx1 + 1.f)*Width / 2), (int)((vy1 + 1.f)*Height / 2));
 						fff::IntPoint p2((int)((vx2 + 1.f)*Width / 2), (int)((vy2 + 1.f)*Height / 2));
 						DrawTriangle(p0, p1, p2, fff::Color(rand() % 256, rand() % 256, rand() % 256, 255));
-						//DrawTriangle(p0, p1, p2, fff::Color::Blue);
 					}
 				}
 				index_offset += fv;
